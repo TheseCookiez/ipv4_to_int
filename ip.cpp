@@ -1,7 +1,9 @@
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <string>
 #include <vector>
 
 /*
@@ -14,26 +16,39 @@
  * if using .csv file, remove header first
  */
 
+std::basic_string<char> get_filename() {
+  std::basic_string<char> filename;
+  std::cin >> filename;
+
+  return filename;
+}
+
 // Read ip source file into std::vector
-std::vector<std::string> get_file_content() {
-  std::fstream ipfile("ipfile");
+std::vector<std::string> get_file_content(std::basic_string<char> filename) {
+  std::fstream ipfile(filename);
   std::vector<std::string> ip_vec;
   std::string line;
-  if (ipfile.is_open()) {
+  if (ipfile.is_open() && ipfile.good()) {
     while (ipfile.good()) {
       std::getline(ipfile, line);
       ip_vec.push_back(line);
     }
+  } else {
+    std::cout << "Failed reading from file: " << filename << "\n";
+    std::exit(1);
   }
+  ipfile.close();
   return ip_vec;
 }
 
 // Save std:.vector to result file
-void save_file_content(std::vector<unsigned int> ip_int_vec) {
-  std::ofstream result("result");
+void save_file_content(std::vector<unsigned int> ip_int_vec,
+                       std::basic_string<char> filename) {
+  std::ofstream result(filename);
   for (const unsigned int &i : ip_int_vec) {
     result << i << "\n";
   }
+  result.close();
 }
 
 // Convenience func to print std::vector containing strings
@@ -68,11 +83,19 @@ std::vector<unsigned int> convert_to_int(std::vector<std::string> ip_vec) {
 }
 
 int main(int argc, char *argv[]) {
-  std::vector<std::string> ip_vec = get_file_content();
-  // print_vec(ip_vec);
+  std::cout << "Enter an input filename:\n> ";
+  auto input_file = get_filename();
+  std::cout << "Enter an output filename:\n> ";
+  auto result_file = get_filename();
+
+  std::vector<std::string> ip_vec = get_file_content(input_file);
+
+  std::cout << "Converting IPv4 to int...\n";
   std::vector<unsigned int> ip_int_vec = convert_to_int(ip_vec);
+
+  std::cout << "Sorting vector...\n";
   std::sort(ip_int_vec.begin(), ip_int_vec.end(), std::less<unsigned int>());
-  // print_vec_int(ip_int_vec);
-  save_file_content(ip_int_vec);
+
+  save_file_content(ip_int_vec, result_file);
   return 0;
 }
