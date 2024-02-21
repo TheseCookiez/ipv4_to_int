@@ -7,9 +7,6 @@
 #include <vector>
 
 /*
- * Source file name: "ipfile"
- * Result file name: "result"
- *
  * Source file must be formatted as single IPv4 string pr. line
  * Result file will be formatted as single IPv4 unsigned int pr. line
  *
